@@ -26,7 +26,16 @@ No PowerShell, troque `scripts/flutter.sh` por `.\scripts\flutter.ps1`.
 ## Gerar o APK apontando para o backend no seu PC
 
 1. Descubra o IP do PC na rede Wi-Fi: `ipconfig` (campo "Endereço IPv4", por exemplo `192.168.0.10`).
-2. Suba o backend (porta 8080). O Spring já escuta em `0.0.0.0`.
+2. Suba o backend (porta 8080). O Spring já escuta em `0.0.0.0`. Para a demonstração,
+   `./mvnw spring-boot:run` em `ADS_EduardoCamargo_AgilizaDelivery/agilizadelivery/`, sem
+   variáveis, sobe no perfil `h2` (banco em memória, recriado a cada reinício) com a carga
+   de demonstração:
+   - entregadores: `entregador1@agiliza.dev` e `entregador2@agiliza.dev`, senha `agiliza123`
+     (o app sempre envia `canal: "APP"`);
+   - operador: `operador@agiliza.dev`, mesma senha (despacha os lotes pelo Backoffice ou pela
+     coleção Postman em `agilizadelivery/postman/`).
+
+   Essas credenciais são **só de desenvolvimento**.
 3. Libere a porta 8080 no Firewall do Windows (regra de entrada TCP 8080, rede privada).
 4. Gere o APK de debug:
 

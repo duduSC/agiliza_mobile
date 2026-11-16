@@ -21,7 +21,10 @@ final servicoLocalizacaoProvider = Provider<ServicoLocalizacao>(
   (ref) => const ServicoLocalizacaoGeolocator(),
 );
 
-final fakeBackendProvider = Provider<FakeBackend>((ref) => FakeBackend());
+/// `--dart-define=FAKE_CAIXA_FECHADO=true` abre o cenário de caixa fechado no acerto.
+final fakeBackendProvider = Provider<FakeBackend>(
+  (ref) => FakeBackend(caixaFechado: const bool.fromEnvironment('FAKE_CAIXA_FECHADO')),
+);
 
 /// Contador de "sessão expirada": incrementado quando o refresh falha. A
 /// sessão escuta este evento e faz o logout (Constituição 6.2).
