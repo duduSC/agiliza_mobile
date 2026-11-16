@@ -1,6 +1,6 @@
 # T001 — Setup do projeto Flutter via Docker
 
-**Status:** PENDENTE
+**Status:** CONCLUIDA
 **Depende de:** —
 **Referências no DVP:** 1.5.1, 1.5.2 (Flutter 3.x), 1.2.5 (só Android), RNF10 (API 26+), 2.2 (Entrega 1/5)
 

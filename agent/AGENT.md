@@ -335,7 +335,15 @@ A navegação principal é uma barra inferior com **Início** e **Acerto**, mais
 
 ## 9. Skills
 
-Não há skills instaladas especificamente para este agente. Siga a documentação oficial do Flutter, do Riverpod, do go_router, do geolocator e do url_launcher. Se o Orquestrador instalar skills em `../.claude/skills/`, elas orientam a técnica, mas nunca mudam escopo, pilha ou regra.
+Instaladas em `../.claude/skills/` em 15/11/2026, vindas de `sickn33/agentic-awesome-skills` (aprovadas pelo Eduardo):
+
+| Situação | Skill | Atenção: o que ignorar nela |
+| --- | --- | --- |
+| Widgets, Dart 3, Riverpod, testes de widget, performance | `flutter-expert` | Bloc, GetX, MobX, GetIt, Dio, freezed/geração de código, iOS, web, desktop, Firebase — fora da pilha da seção 4 |
+| Toque (48 dp, zona do polegar), navegação, Material 3 no Android, bateria, testes | `mobile-design` (ler `touch-psychology.md`, `platform-android.md`, `mobile-navigation.md`, `mobile-testing.md` conforme a tarefa) | "Offline-capable" e sincronização (`mobile-backend.md`): a fila offline está fora deste ciclo (D008); `platform-ios.md` não se aplica |
+| Armazenamento seguro, cleartext, permissões, dados pessoais | `mobile-security-coder` | WebView, biometria e pinning de certificado: fora do escopo |
+
+As skills orientam a técnica e **nunca** mudam escopo, pilha ou regra de negócio (Constituição, cabeçalho). Para o resto, siga a documentação oficial do Flutter, do Riverpod, do go_router, do geolocator e do url_launcher.
 
 ---
 
