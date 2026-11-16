@@ -67,12 +67,14 @@ void main() {
     });
 
     test('contestar só com caixa aberto/reaberto e linha A_ACERTAR', () {
-      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: StatusCaixa.ABERTO), isTrue);
-      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: StatusCaixa.REABERTO), isTrue);
-      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: StatusCaixa.FECHADO), isFalse);
-      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: null), isFalse);
-      expect(podeContestar(situacao: SituacaoAcerto.EM_REVISAO, statusCaixa: StatusCaixa.ABERTO), isFalse);
-      expect(podeContestar(situacao: SituacaoAcerto.CONSOLIDADA, statusCaixa: StatusCaixa.ABERTO), isFalse);
+      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: StatusCaixa.ABERTO, contestacaoPermitida: true), isTrue);
+      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: StatusCaixa.REABERTO, contestacaoPermitida: true), isTrue);
+      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: StatusCaixa.FECHADO, contestacaoPermitida: false), isFalse);
+      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: null, contestacaoPermitida: false), isFalse);
+      expect(podeContestar(situacao: SituacaoAcerto.EM_REVISAO, statusCaixa: StatusCaixa.ABERTO, contestacaoPermitida: true), isFalse);
+      expect(podeContestar(situacao: SituacaoAcerto.A_ACERTAR, statusCaixa: StatusCaixa.ABERTO, contestacaoPermitida: false), isFalse,
+          reason: 'o backend tem a palavra final');
+      expect(podeContestar(situacao: SituacaoAcerto.CONSOLIDADA, statusCaixa: StatusCaixa.ABERTO, contestacaoPermitida: true), isFalse);
     });
   });
 }

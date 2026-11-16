@@ -1,6 +1,6 @@
 # T004 — Acerto do turno, contestação e APK final
 
-**Status:** PENDENTE
+**Status:** CONCLUIDA
 **Depende de:** T003. Do backend: `../../ADS_EduardoCamargo_AgilizaDelivery/agente_backend/tarefas/T009-endpoints-do-entregador.md` (não bloqueia: use fake).
 **Referências no DVP:** UC08 (1.4.2.8, A1, E1, E2), HU14, 1.5.5, RF03
 

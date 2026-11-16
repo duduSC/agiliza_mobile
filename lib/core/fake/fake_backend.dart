@@ -16,7 +16,57 @@ class FakeBackend {
   FakeBackend({
     this.latencia = const Duration(milliseconds: 400),
     this.consultasAteDespacho = 1,
-  });
+    bool caixaFechado = false,
+  }) : statusCaixa = caixaFechado ? 'FECHADO' : 'ABERTO';
+
+  /// Status do caixa do dia (`ABERTO`, `FECHADO`, `REABERTO` ou `null`).
+  String? statusCaixa;
+
+  /// Entregas contestadas pelo entregador (UC08 A1).
+  final Set<String> contestadas = {};
+
+  /// Entregas do turno finalizadas antes de o app abrir (cenário de exemplo).
+  final List<Map<String, Object?>> linhasIniciaisAcerto = [
+    {
+      'entregaId': 'fake-antiga-1',
+      'nomeCliente': 'Ana Prado',
+      'finalizadaEm': '2026-11-17T18:10:00',
+      'status': 'ENTREGUE',
+      'distanciaKm': 1.4,
+      'faixaDeKm': 0.0,
+      'faixaAteKm': 3.0,
+      'foraDeArea': false,
+      'valorRepasse': 9.0,
+      'situacao': 'CONSOLIDADA',
+      'reciboId': 'fake-recibo-1',
+    },
+    {
+      'entregaId': 'fake-antiga-2',
+      'nomeCliente': 'Bruno Reis',
+      'finalizadaEm': '2026-11-17T18:40:00',
+      'status': 'FALHA',
+      'distanciaKm': 4.2,
+      'faixaDeKm': 3.0,
+      'faixaAteKm': 5.0,
+      'foraDeArea': false,
+      'valorRepasse': 12.0,
+      'situacao': 'A_ACERTAR',
+      'reciboId': null,
+    },
+    {
+      'entregaId': 'fake-antiga-3',
+      'nomeCliente': 'Clara Dias',
+      'finalizadaEm': '2026-11-17T19:05:00',
+      'status': 'ENTREGUE',
+      'distanciaKm': 9.8,
+      'faixaDeKm': null,
+      'faixaAteKm': null,
+      'foraDeArea': true,
+      'valorRepasse': 15.0,
+      'situacao': 'A_ACERTAR',
+      'reciboId': null,
+    },
+  ];
 
   /// Atraso artificial de cada chamada (zero nos testes).
   final Duration latencia;

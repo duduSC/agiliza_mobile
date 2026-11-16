@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/sessao/sessao.dart';
 import '../core/ui/estados.dart';
+import '../features/acerto/acerto.dart';
 import '../features/auth/auth.dart';
 import '../features/inicio/inicio.dart';
 import '../features/lote/lote.dart';
@@ -15,6 +16,7 @@ abstract final class Rotas {
   static const login = '/login';
   static const inicio = '/inicio';
   static const lote = '/lote';
+  static const acerto = '/acerto';
 }
 
 /// Guarda de sessão (AGENT.md 7): sem sessão, tudo leva a `/login`.
@@ -43,9 +45,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: Rotas.login, builder: (context, state) => const LoginPage()),
       ShellRoute(
-        builder: (context, state, child) => ShellEntregador(child: child),
+        builder: (context, state, child) =>
+            ShellEntregador(local: state.matchedLocation, child: child),
         routes: [
           GoRoute(path: Rotas.inicio, builder: (context, state) => const InicioPage()),
+          GoRoute(path: Rotas.acerto, builder: (context, state) => const AcertoPage()),
         ],
       ),
       GoRoute(
@@ -68,10 +72,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-/// Moldura das telas principais: título e menu com o logout.
+/// Moldura das telas principais: título, menu com o logout e a barra
+/// inferior Início | Acerto (AGENT.md 7).
 class ShellEntregador extends ConsumerWidget {
-  const ShellEntregador({super.key, required this.child});
+  const ShellEntregador({super.key, required this.local, required this.child});
 
+  final String local;
   final Widget child;
 
   @override
@@ -96,6 +102,26 @@ class ShellEntregador extends ConsumerWidget {
         ],
       ),
       body: child,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: local.startsWith(Rotas.acerto) ? 1 : 0,
+        onDestinationSelected: (i) => context.go(i == 1 ? Rotas.acerto : Rotas.inicio),
+        destinations: const [
+          NavigationDestination(
+            key: Key('aba-inicio'),
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Início',
+            tooltip: 'Início',
+          ),
+          NavigationDestination(
+            key: Key('aba-acerto'),
+            icon: Icon(Icons.payments_outlined),
+            selectedIcon: Icon(Icons.payments),
+            label: 'Acerto',
+            tooltip: 'Acerto do turno',
+          ),
+        ],
+      ),
     );
   }
 }
