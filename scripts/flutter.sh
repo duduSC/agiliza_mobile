@@ -17,10 +17,12 @@ BIN="${FLUTTER_BIN:-flutter}"
 TTY_ARGS=()
 if [ -t 0 ] && [ -t 1 ]; then TTY_ARGS=(-it); fi
 
-# MSYS_NO_PATHCONV evita que /app vire C:/Program Files/Git/app
+# MSYS_NO_PATHCONV evita que /app vire C:/Program Files/Git/app.
+# agiliza_android_sdk guarda o NDK, o CMake e as plataformas que o Gradle instala no SDK.
 MSYS_NO_PATHCONV=1 exec docker run --rm "${TTY_ARGS[@]}" \
   -v "$HOST_DIR":/app -w /app \
   -v agiliza_pub_cache:/root/.pub-cache \
   -v agiliza_gradle:/root/.gradle \
+  -v agiliza_android_sdk:/opt/android-sdk-linux \
   "$IMAGEM" \
   "$BIN" "$@"

@@ -15,6 +15,8 @@ $argumentos = @(
   '-v', "${Raiz}:/app", '-w', '/app',
   '-v', 'agiliza_pub_cache:/root/.pub-cache',
   '-v', 'agiliza_gradle:/root/.gradle',
+  # O Gradle instala NDK, CMake e plataformas no SDK; o volume evita baixar de novo.
+  '-v', 'agiliza_android_sdk:/opt/android-sdk-linux',
   $Imagem,
   $Bin
 ) + $args

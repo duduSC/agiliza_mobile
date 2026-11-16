@@ -1,6 +1,6 @@
 # Relatório — T001 Setup do projeto Flutter via Docker
 
-**Status final:** BLOQUEADA (falta só o `build apk --debug`: a VM do Docker Desktop caiu durante o primeiro build e não voltou)
+**Status final:** CONCLUIDA (retomada depois que o Eduardo reiniciou o Docker Desktop; antes estava BLOQUEADA)
 **Data:** 2026-11-15
 
 ## O que foi feito
@@ -27,9 +27,13 @@
 - `README.md`: Docker, gerar o APK com o IP do PC, firewall da porta 8080 e instalação no aparelho.
 - **Correção depois da queda do Docker:** `android/gradle.properties` vinha do template com `-Xmx8G`. A máquina tem 7,7 GB de RAM e a VM do WSL2 do Docker Desktop fica com cerca de metade disso. O Gradle passou a usar `-Xmx2G`, sem daemon, com 2 workers e Kotlin em processo. É a causa mais provável da queda (ver Dúvidas).
 
+## Histórico do bloqueio (resolvido)
+- **Primeira tentativa do `build apk --debug` (bloqueio, já resolvido):** O primeiro build rodou em background. Por volta das 18h57 a VM do Docker Desktop parou de responder: o log `com.docker.backend.exe.log` mostra `connect tcp 192.168.65.7:2376: no route to host` em sequência, e todo comando `docker` devolve `500 Internal Server Error`. Mais de 40 minutos depois continuava assim. Pelo `AGENT.md` (4.1 e 3.3.1), o agente não reinicia nem reinstala o Docker: **é preciso que o Eduardo reinicie o Docker Desktop.** A tarefa ficou BLOQUEADA até o Eduardo reiniciar o Docker Desktop.
+- **Retomada:** os três comandos rodaram de novo sobre o commit `f4f1cb2` da T001, num *worktree* separado (`_wt_t001/`, fora do git), para não misturar com o código da T002 que já estava no diretório de trabalho. Os três passaram (tabela abaixo). O build levou cerca de 33 min porque o Gradle instalou NDK 28.2, CMake 3.22.1 e a plataforma 35 dentro do container.
+- **Depois do build:** os dois wrappers passaram a montar também `agiliza_android_sdk:/opt/android-sdk-linux`, para que o NDK, o CMake e as plataformas instalados pelo Gradle não sejam baixados de novo a cada build. O volume foi conferido (`flutter --version` e `ls` do SDK pelo volume), mas o APK desta tarefa foi gerado **antes** dessa mudança. O próximo build (T004) a exercita.
+
 ## O que NÃO foi feito (e por quê)
-- **`scripts/flutter.sh build apk --debug` não terminou.** O primeiro build rodou em background. Por volta das 18h57 a VM do Docker Desktop parou de responder: o log `com.docker.backend.exe.log` mostra `connect tcp 192.168.65.7:2376: no route to host` em sequência, e todo comando `docker` devolve `500 Internal Server Error`. Mais de 40 minutos depois continuava assim. Pelo `AGENT.md` (4.1 e 3.3.1), o agente não reinicia nem reinstala o Docker: **é preciso que o Eduardo reinicie o Docker Desktop.** Por isso a tarefa fica BLOQUEADA, sem merge para `develop`.
-- O `analyze` e o `test` foram rodados **antes** de dois ajustes pequenos que estão no commit da T001: a função `ApiClient.converterCorpo` (só refatoração de `converter`) e o `gradle.properties` acima. Ao retomar, os três comandos têm de ser rodados de novo sobre o commit da T001.
+- Nada do escopo ficou de fora.
 
 ## Arquivos criados/alterados
 - `scripts/flutter.sh`, `scripts/flutter.ps1`, `.gitattributes` (LF nos scripts; CRLF só em `.ps1`/`.bat`), `.gitignore` (+ `build/`, `*.jks`, `*.keystore`, `key.properties`), `README.md`
@@ -38,17 +42,17 @@
 - `lib/main.dart`, `lib/app/{app,config,tema}.dart`
 - `lib/core/api/{api_client,endpoints,erros}.dart`, `lib/core/dominio/{enums,json_estrito,transicoes}.dart`, `lib/core/formatacao/{moeda,distancia,data_hora}.dart`
 - `test/core/{formatacao,dominio,api_client}_test.dart`
-- Commits na branch `feature/T001-setup-projeto-flutter-docker`: `4660b77`, `0a503a8` (governança: `.claude/skills/` e a seção 9 do `AGENT.md`, que o Orquestrador alterou durante a sessão) e `7e9d7f1`.
+- Commits na branch `feature/T001-setup-projeto-flutter-docker`: `4660b77`, `0a503a8` (governança: `.claude/skills/` e a seção 9 do `AGENT.md`, que o Orquestrador alterou durante a sessão) `7e9d7f1`, `f4f1cb2` e o ajuste do volume do SDK.
 
 ## Verificação
 | Comando | Resultado |
 | --- | --- |
-| `scripts/flutter.sh analyze` | ✅ "No issues found! (ran in 36.3s)", depois de corrigir 1 info (`prefer_initializing_formals` no `ApiClient`) |
-| `scripts/flutter.sh test` | 26 testes, 26 passaram ("All tests passed!") |
-| `scripts/flutter.sh build apk --debug` | ❌ não concluído: a VM do Docker Desktop caiu durante o build (ver acima) |
+| `scripts/flutter.sh analyze` | ✅ "No issues found! (ran in 25.2s)" (commit `f4f1cb2`) |
+| `scripts/flutter.sh test` | ✅ 26 testes, 26 passaram ("All tests passed!") |
+| `scripts/flutter.sh build apk --debug` | ✅ "Built build/app/outputs/flutter-apk/app-debug.apk" (Gradle 1959,8 s; 167 MB), com 3 avisos de API obsoleta do `geolocator_android` |
 
 ## Verificação manual pendente (aparelho físico)
-- Instalar o APK de debug quando ele for gerado. Nesta tarefa só há a tela "Agiliza Entregador".
+- Instalar o APK de debug no aparelho (Android 8.0+). Nesta tarefa só há a tela "Agiliza Entregador"; o APK final da apresentação sai na T004.
 
 ## Desvios conscientes do DVP tocados (D008)
 - O manifest não tem `ACCESS_BACKGROUND_LOCATION` nem *foreground service*: GPS em segundo plano está fora deste ciclo.
@@ -66,8 +70,7 @@
 - Nenhuma.
 
 ## Dúvidas / bloqueios
-- **BLOQUEIO:** Docker Desktop sem resposta (`500` em toda chamada; VM `192.168.65.7` inalcançável desde ~18h57). **Ação do Eduardo:** reiniciar o Docker Desktop (Quit e abrir de novo) e conferir `docker info`. Se a máquina ficar sem memória de novo, criar `%UserProfile%\.wslconfig` com `[wsl2]` e `memory=4GB` (decisão dele; o agente não alterou nada fora de `agiliza_mobile/`).
-- Ao retomar: rodar `analyze`, `test` e `build apk --debug` sobre o commit da T001, preencher a tabela acima, fazer o merge `--no-ff` para `develop` e marcar CONCLUIDA.
+- O bloqueio do Docker foi resolvido. Se a VM voltar a cair com pouca memória, a opção é criar `%UserProfile%.wslconfig` com `[wsl2]` e `memory=4GB`; essa decisão é do Eduardo.
 
 ## Sugestões (não implementadas)
 - Nenhuma.
