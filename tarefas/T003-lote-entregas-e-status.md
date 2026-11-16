@@ -1,6 +1,6 @@
 # T003 — Lote, detalhe da entrega, deep links e ENTREGUE/FALHA
 
-**Status:** PENDENTE
+**Status:** CONCLUIDA
 **Depende de:** T002. Do backend: `../../ADS_EduardoCamargo_AgilizaDelivery/agente_backend/tarefas/T009-endpoints-do-entregador.md` (não bloqueia: use fake).
 **Referências no DVP:** UC02 (1.4.2.2, fluxo principal, A1), HU04, HU05, RF02, RNF11, 1.4.4 (máquina de estados), 1.5.5 (FALHA com repasse integral)
 

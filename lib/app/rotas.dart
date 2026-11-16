@@ -48,7 +48,17 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: Rotas.inicio, builder: (context, state) => const InicioPage()),
         ],
       ),
-      GoRoute(path: Rotas.lote, builder: (context, state) => const LotePage()),
+      GoRoute(
+        path: Rotas.lote,
+        builder: (context, state) => const LotePage(),
+        routes: [
+          GoRoute(
+            path: 'entrega/:id',
+            builder: (context, state) =>
+                EntregaPage(entregaId: state.pathParameters['id']!),
+          ),
+        ],
+      ),
     ],
   );
   ref.onDispose(() {
