@@ -46,7 +46,13 @@ class FakeBackend {
   /// Lote ativo em JSON, no formato do `LoteDoEntregadorResponse`.
   Map<String, Object?>? loteAtivo;
 
-  Future<void> _esperar() async {
+  /// Último corpo recebido em `POST /entregas/{id}/status` (para os testes).
+  Map<String, Object?>? ultimoCorpoStatus;
+
+  /// Entregas finalizadas em lotes já concluídos (alimentam o acerto).
+  final List<Map<String, Object?>> entregasFinalizadas = [];
+
+  Future<void> esperarLatencia() async {
     if (latencia > Duration.zero) await Future<void>.delayed(latencia);
   }
 
@@ -56,7 +62,7 @@ class FakeBackend {
   // ---------------------------------------------------------------- auth
 
   Future<Map<String, Object?>> login(String email, String senha) async {
-    await _esperar();
+    await esperarLatencia();
     final e = email.trim().toLowerCase();
     if (senha != senhaPadrao || (e != emailEntregador && e != emailOperador)) {
       throw _erro(401, CodigosErro.credenciaisInvalidas, 'Credenciais inválidas');
@@ -77,7 +83,7 @@ class FakeBackend {
   }
 
   Future<RespostaLogin> refresh(String refreshToken) async {
-    await _esperar();
+    await esperarLatencia();
     if (!refreshToken.startsWith('fake-refresh-')) {
       throw _erro(401, CodigosErro.naoAutenticado, 'Sessão expirada');
     }
@@ -97,12 +103,12 @@ class FakeBackend {
   // ---------------------------------------------------------- entregador
 
   Future<Motoboy> me() async {
-    await _esperar();
+    await esperarLatencia();
     return motoboy;
   }
 
   Future<Motoboy> alterarDisponibilidade(StatusDisponibilidadeMotoboy status) async {
-    await _esperar();
+    await esperarLatencia();
     if (status == StatusDisponibilidadeMotoboy.EM_ROTA) {
       throw _erro(400, 'DADOS_INVALIDOS', 'EM_ROTA é controlado pelo lote');
     }
@@ -116,7 +122,7 @@ class FakeBackend {
   }
 
   Future<Motoboy> enviarPosicao(Coordenada c) async {
-    await _esperar();
+    await esperarLatencia();
     if (motoboy.statusDisponibilidade == StatusDisponibilidadeMotoboy.OFFLINE) {
       throw _erro(422, CodigosErro.regraNegocioViolada, 'Entregador offline');
     }
@@ -129,13 +135,27 @@ class FakeBackend {
 
   /// `null` equivale ao `204` do servidor.
   Future<Map<String, Object?>?> buscarLoteAtivo() async {
-    await _esperar();
+    await esperarLatencia();
     if (loteAtivo == null &&
         motoboy.statusDisponibilidade == StatusDisponibilidadeMotoboy.ONLINE) {
       _consultasOnline++;
       if (_consultasOnline > consultasAteDespacho) despacharLoteDeExemplo();
     }
     return loteAtivo;
+  }
+
+  /// Todas as entregas em estado final: lote CONCLUIDO, entregador volta a
+  /// ONLINE e o `lote-ativo` passa a responder 204 (UC02 passo 6).
+  void concluirLoteAtivo() {
+    final lote = loteAtivo;
+    if (lote == null) return;
+    lote['status'] = 'CONCLUIDO';
+    entregasFinalizadas.addAll(
+        (lote['entregas']! as List<Object?>).cast<Map<String, Object?>>());
+    loteAtivo = null;
+    motoboy = motoboy.copiarCom(statusDisponibilidade: StatusDisponibilidadeMotoboy.ONLINE);
+    // O próximo lote de exemplo chega algumas consultas depois.
+    _consultasOnline = -2;
   }
 
   /// Faz o papel do operador despachando um lote (ONLINE → EM_ROTA, DVP 1.4.4).
