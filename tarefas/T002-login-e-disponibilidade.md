@@ -1,6 +1,6 @@
 # T002 — Login, sessão, Online/Offline e telemetria
 
-**Status:** PENDENTE
+**Status:** CONCLUIDA
 **Depende de:** T001. Do backend: `../../ADS_EduardoCamargo_AgilizaDelivery/agente_backend/tarefas/T009-endpoints-do-entregador.md` (não bloqueia: use fake até ela terminar).
 **Referências no DVP:** UC07 (1.4.2.7, E1–E4), HU13, UC02 E1, RF04, RNF01, RNF07, RNF11
 

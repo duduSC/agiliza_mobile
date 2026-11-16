@@ -17,6 +17,9 @@ abstract final class CodigosErro {
   static const caixaFechado = 'CAIXA_FECHADO';
   static const regraNegocioViolada = 'REGRA_NEGOCIO_VIOLADA';
 
+  /// Lote ou entrega de outro entregador, inexistente ou devolvido (S001).
+  static const recursoNaoEncontrado = 'RECURSO_NAO_ENCONTRADO';
+
   /// Códigos internos do app (não vêm do backend).
   static const semConexao = 'APP_SEM_CONEXAO';
   static const contratoInvalido = 'APP_CONTRATO_INVALIDO';
